@@ -2,7 +2,7 @@
 
 import rospy
 import actionlib
-from assignment_2_2024.msg import PlanningAction
+from assignment_2_2024.msg import PlanningAction, PlanningGoal
 from nav_msgs.msg import Odometry
 from assignment2_rt_part1.msg import robot_status
 import threading
@@ -29,8 +29,8 @@ def feedback_callback(feedback):
 def send_goal(client, target_x, target_y):
     """Send the goal to the action server."""
     goal = PlanningGoal()  # Create a goal instance
-    goal.target.x = target_x  # Set the target x-coordinate
-    goal.target.y = target_y  # Set the target y-coordinate
+    goal.target_x = target_x  # Set the target x-coordinate
+    goal.target_y = target_y  # Set the target y-coordinate
     rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
     
     # Send the goal to the action server and listen for feedback
@@ -48,8 +48,8 @@ def user_input_thread():
     """Thread to listen for user input (e.g., cancel command)."""
     global cancel_goal_flag
     while not rospy.is_shutdown():
-        user_input = raw_input("Enter 'cancel' to cancel the current goal: ")
-        if user_input.lower() == 'cancel':
+        user_input = input("Enter 'cancel' to cancel the current goal: ").strip().lower()
+        if user_input == 'cancel':
             cancel_goal_flag = True  # Set the cancel flag when user types 'cancel'
 
 def action_client_node():
@@ -84,27 +84,29 @@ def action_client_node():
             send_goal(client, target_x, target_y)
 
             # Monitor the goal state and robot's position while the goal is in progress
-            while not client.get_state().is_done():
+            while not rospy.is_shutdown() and client.get_state() not in [actionlib.GoalStatus.SUCCEEDED, actionlib.GoalStatus.ABORTED, actionlib.GoalStatus.REJECTED]:
                 cancel_goal(client)  # Check if the user wants to cancel the goal
 
                 # Publish robot's current position and velocity
-                pos_vel_msg = PositionVelocity()
+                pos_vel_msg = robot_status()
                 pos_vel_msg.x = current_x
                 pos_vel_msg.y = current_y
                 pos_vel_msg.vel_x = vel_x
                 pos_vel_msg.vel_y = vel_y
                 pub.publish(pos_vel_msg)
 
-                rospy.sleep(0.5)  # Sleep for 100 ms to avoid spamming messages
+                rospy.sleep(0.5)  # Sleep for 500 ms to avoid spamming messages
 
-            # After the goal is completed, log feedback
+            # Check the outcome of the goal
             if client.get_state() == actionlib.GoalStatus.SUCCEEDED:
-                rospy.loginfo("Goal reached!")
+                rospy.loginfo("Goal reached successfully!")
+            elif cancel_goal_flag:
+                rospy.loginfo("Goal was canceled by the user.")
             else:
-                rospy.loginfo("Goal did not succeed!")
+                rospy.loginfo("Goal did not succeed. Status: %d", client.get_state())
 
         except ValueError:
-            rospy.logerr("Invalid input! Please enter a valid number for the target coordinates.")
+            rospy.logerr("Invalid input! Please enter valid numbers for the target coordinates.")
         
         rospy.sleep(1)  # Sleep for 1 second before allowing another input
 
@@ -112,4 +114,4 @@ if __name__ == '__main__':
     try:
         action_client_node()  # Run the Action Client
     except rospy.ROSInterruptException:
-        pass
+        rospy.loginfo("Action client node terminated.")

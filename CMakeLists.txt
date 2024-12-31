@@ -8,8 +8,14 @@ project(assignment2_rt_part1)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
+    roscpp
+    rospy
+    std_msgs
+    actionlib
+    actionlib_msgs
+    geometry_msgs
+    nav_msgs
+    message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,11 +52,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Add message files
+add_message_files(
+  FILES
+  robot_status.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -67,11 +73,13 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
-
+# Generate messages
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  actionlib_msgs
+)
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
 ################################################
