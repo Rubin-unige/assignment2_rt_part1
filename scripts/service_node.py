@@ -6,8 +6,8 @@ from assignment2_rt_part1.srv import get_last_target, get_last_targetResponse
 def handle_get_last_target(req):
     """Service callback to return the last target coordinates."""
      # Read the target coordinates from ROS parameters
-    last_target_x = rospy.get_param('last_target_x', 0.0)  # Default value if not set
-    last_target_y = rospy.get_param('last_target_y', 0.0)  # Default value if not set
+    last_target_x = rospy.get_param('last_target_x', 0.0)
+    last_target_y = rospy.get_param('last_target_y', 0.0)  
     rospy.loginfo("Returning last target coordinates: x={}, y={}".format(last_target_x, last_target_y))
     return get_last_targetResponse(last_target_x, last_target_y)
 

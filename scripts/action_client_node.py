@@ -5,7 +5,6 @@ import actionlib
 from assignment_2_2024.msg import PlanningAction, PlanningGoal
 from nav_msgs.msg import Odometry
 from assignment2_rt_part1.msg import robot_status
-from assignment2_rt_part1.srv import get_last_target
 
 # Global variables to store the robot's position and velocity
 current_x = 0.0
@@ -53,7 +52,7 @@ def cancel_goal(client):
 
 def action_client_node():
     """Main action client node."""
-    global cancel_goal_flag, goal_active, last_target_x, last_target_y
+    global cancel_goal_flag, goal_active
     
     rospy.init_node('action_client_node')
     
@@ -81,7 +80,7 @@ def action_client_node():
             # Monitor the goal state and robot's position while the goal is in progress
             while not rospy.is_shutdown() and client.get_state() not in [actionlib.GoalStatus.SUCCEEDED, actionlib.GoalStatus.ABORTED, actionlib.GoalStatus.REJECTED]:
                 # Check for user input to cancel the goal
-                user_input = input("Enter 'cancel' to cancel the current goal or press Enter to continue: ").strip().lower()
+                user_input = input("Robot running!! Enter 'cancel' to cancel the current goal: ").strip().lower()
                 if user_input == 'cancel':
                     cancel_goal_flag = True
                     cancel_goal(client)
