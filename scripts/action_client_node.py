@@ -5,22 +5,23 @@ import actionlib
 from assignment_2_2024.msg import PlanningAction, PlanningGoal
 from nav_msgs.msg import Odometry
 from assignment2_rt_part1.msg import robot_status
+from assignment2_rt_part1.srv import get_last_target
 
 # Global variables to store the robot's position and velocity
 current_x = 0.0
 current_y = 0.0
 vel_x = 0.0
-vel_y = 0.0
+vel_z = 0.0
 cancel_goal_flag = False  # Flag to cancel the goal
 goal_active = False  # Indicates if a goal is currently being pursued
 
 def odom_callback(msg):
     """Callback function to update robot's position and velocity from /odom."""
-    global current_x, current_y, vel_x, vel_y
+    global current_x, current_y, vel_x, vel_z
     current_x = msg.pose.pose.position.x
     current_y = msg.pose.pose.position.y
     vel_x = msg.twist.twist.linear.x
-    vel_y = msg.twist.twist.linear.y
+    vel_z = msg.twist.twist.angular.z
 
 def feedback_callback(feedback):
     """Feedback callback to handle updates from the action server."""
@@ -35,6 +36,10 @@ def send_goal(client, target_x, target_y):
     goal.target_pose.pose.position.z = 0.0
     goal.target_pose.pose.orientation.w = 1.0
     rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
+
+    # Set the target coordinates as ROS parameters
+    rospy.set_param('last_target_x', target_x)
+    rospy.set_param('last_target_y', target_y)
     
     # Send the goal to the action server and listen for feedback
     client.send_goal(goal, feedback_cb=feedback_callback)
@@ -48,7 +53,7 @@ def cancel_goal(client):
 
 def action_client_node():
     """Main action client node."""
-    global cancel_goal_flag, goal_active
+    global cancel_goal_flag, goal_active, last_target_x, last_target_y
     
     rospy.init_node('action_client_node')
     
@@ -62,6 +67,7 @@ def action_client_node():
 
     # Publisher to send robot's position and velocity to the topic
     pub = rospy.Publisher('/robot_status', robot_status, queue_size=10)
+    
 
     while not rospy.is_shutdown():
         try:
@@ -86,7 +92,7 @@ def action_client_node():
                 pos_vel_msg.x = current_x
                 pos_vel_msg.y = current_y
                 pos_vel_msg.vel_x = vel_x
-                pos_vel_msg.vel_y = vel_y
+                pos_vel_msg.vel_z = vel_z
                 pub.publish(pos_vel_msg)
 
                 rospy.sleep(0.5)  # Sleep for 500 ms to avoid spamming messages
