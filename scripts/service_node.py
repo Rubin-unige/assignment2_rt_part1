@@ -8,7 +8,6 @@ def handle_get_last_target(req):
      # Read the target coordinates from ROS parameters
     last_target_x = rospy.get_param('last_target_x', 0.0)
     last_target_y = rospy.get_param('last_target_y', 0.0)  
-    rospy.loginfo("Returning last target coordinates: x={}, y={}".format(last_target_x, last_target_y))
     return get_last_targetResponse(last_target_x, last_target_y)
 
 def service_node():
