@@ -6,9 +6,9 @@ This repository contains the assignment work for the **Research Track I** course
 ## Table of Contents
 - [Introduction](#introduction)
 - [Node and Launch File Details](#node-and-launch-file-details)
- - [Action Client Node](#action-client-node)
- - [Service Node](#service-node)
- - [Launch File](#launch-file-coordinate-control)
+    - [Action Client Node](#action-client-node)
+    - [Service Node](#service-node)
+    - [Launch File](#launch-file-coordinate-control)
 - [Repository Structure](#repository-structure)
 - [Getting Started (Read Before Action)](#getting-started-read-before-action)
 - [Launching Nodes](#launching-nodes)
