@@ -112,7 +112,7 @@ mkdir -p ~/ros_ws/src
 cd ~/ros_ws/src
 ```
 
-#### 2. Install the `assignment_2_2024` package
+#### 2. Clone the `assignment_2_2024` package
 Before cloning this repository, you need to get the `assignment_2_2024` package, which is responsible for starting the simulation environment and the action server. Clone the `assignment_2_2024` repository into your workspace’s `src` folder:
 ```bash
 git clone https://github.com/CarmineD8/assignment_2_2024.git
@@ -144,10 +144,23 @@ After building and sourcing, source the workspace manually for the first time in
 source ~/ros_ws/devel/setup.bash
 ```
 
-
-
-
-
 ## Launching Nodes
+
+#### 1. Launch the `assignment_2_2024` Package
+
+Before launching your node, ensure that the simulation environment is running. Start the `assignment_2_2024` package to load the simulation in Gazebo and Rviz:
+```bash
+roslaunch assignment_2_2024 assignment1.launch
+```
+This will spawn the robot in the simulation environment and start the action server, which the Action Client Node will interact with. <br>
+Please wait for everything to load properly before proceeding.
+
+#### 2. Launch the Action Client Node and Service Node
+After the simulation environment is set up, you can launch your Action Client Node and Service Node using the following launch file:
+```bash
+roslaunch assignment2_rt_part1 coordinate_control_py.launch
+```
+This will launch both the Action Client Node and the Service Node simultaneously.
+
 ## Implementation Details
 ## Summary
