@@ -2,7 +2,8 @@
 #include <assignment2_rt_part1/get_last_target.h>
 
 // Service callback function
-bool handle_get_last_target(assignment2_rt_part1::get_last_target::Response &res)
+bool handle_get_last_target(assignment2_rt_part1::get_last_target::Request &req,
+    assignment2_rt_part1::get_last_target::Response &res)
 {
     // Read the target coordinates from ROS parameters
     double last_target_x = ros::param::param("last_target_x", 0.0); 
