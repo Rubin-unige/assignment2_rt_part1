@@ -19,7 +19,7 @@ This repository contains the assignment work for the **Research Track I** course
 - [Implementation Details](#implementation-details)
     - [Action Client Node](#action-client-node-1)
     - [Service Node](#service-node-1)
-    - [Launch files](#launch-file-1)
+    - [Launch files](#launch-file)
 - [Summary](#summary)
 
 ## Introduction
@@ -191,12 +191,77 @@ To stop the nodes, simply press `Ctrl+C` in the terminal where each nodes are ru
 ## Implementation Details
 
 ### Action Client Node
+The structure of the `Action Controller Node` is similar in both **C++** and **Python**. The logic is nearly identical in both languages. Since the logic for both versions is fundamentally the same, I will explain the details using the **C++** version as an example.
+
+#### 1. Prompting the User for Target Coordinates
+The node asks the user to enter the target x and y coordinates. If the input is valid, the program stores the values in `target_x` and `target_y`. If the input is invalid, the prompt repeats until a valid number is provided. 
+```cpp
+if (!getValidCoordinate("Enter target x:", target_x)) {
+    continue;
+}
+if (!getValidCoordinate("Enter target y:", target_y)) {
+    continue;
+}
+```
+This validation is done through the function `getValidCoordinate()`. It tries to convert the input string to a `double` using `std::stod()`. If the conversion is successful and the entire input string is a valid number, it stores the value in `coordinate`.
+```cpp
+size_t pos;
+coordinate = std::stod(input, &pos);  // Try converting to double
+```
+If the conversion succeeds and no extra characters remain in the input, the function returns `true`, indicating valid input. If the conversion fails, the user is prompted again to enter a valid number.
+
+#### 2. Send Goal to Action Server
+Once the user has entered valid target coordinates (`target_x` and `target_y`), the next step is to send these coordinates to the Action Server. This is done by creating an action goal message and sending it using the `sendGoal()` function. Here's how the process works:
+```cpp
+assignment_2_2024::PlanningGoal goal;  // Create a goal instance
+goal.target_pose.pose.position.x = target_x;  // Set the target x-coordinate
+goal.target_pose.pose.position.y = target_y;  // Set the target y-coordinate
+
+ac.sendGoal(goal);  // Set up feedback callback
+```
+This communication allows the Action Client Node to request the robot to navigate to the specified target position. The Action Server will process the goal and attempt to move the robot accordingly.
+
+#### 3. Cancel Goal
+#### 4. Goal Reached
+
+#### 5. Subscribe to `/odom`
+The `/odom` topic provides odometry information, including the robot's position and orientation in the world frame. The node subscribes to this topic to get the robot's current position and velocity:
+```cpp
+ros::Subscriber sub_odom = nh.subscribe("/odom", 10, odomCallback);
+```
+The `odomCallback` function processes the incoming messages from the `/odom` topic. It updates the robot's current position (`current_x` and `current_y`) and velocity (`vel_x` and `vel_z`), where `vel_x` is the linear velocity along the x-axis and `vel_z` is the angular velocity around the z-axis.
+```cpp
+void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
+    current_x = msg->pose.pose.position.x;
+    current_y = msg->pose.pose.position.y;
+    vel_x = msg->twist.twist.linear.x;
+    vel_z = msg->twist.twist.angular.z;
+}
+```
+This callback ensures that the Action Client Node can track the robot's movement in real-time, which is essential for calculating how far the robot is from its target and whether it has reached the goal.
+
+#### 6. Publish robot position and velocity
+The Action Client Node publishes the robot's current position and velocity to the `/robot_status` topic. This is done by creating a custom message (`robot_status`) and publishing it through a `ros::Publisher`.
+The node first creates the publisher:
+```cpp
+ros::Publisher pub_pos_vel = nh.advertise<assignment2_rt_part1::robot_status>("/robot_status", 10);
+```
+Then, it publishes the robot's current position (`current_x`, `current_y`) and velocity (`vel_x`, `vel_z`):
+```cpp
+assignment2_rt_part1::robot_status pos_vel_msg;
+pos_vel_msg.x = current_x;
+pos_vel_msg.y = current_y;
+pos_vel_msg.vel_x = vel_x;
+pos_vel_msg.vel_z = vel_z;
+pub_pos_vel.publish(pos_vel_msg);
+```
+The `robot_status` message is a custom message that contains the robot's position and velocity, and it is sent at regular intervals to allow other nodes to access this data.
 
 ### Service Node
 The **Service Node** shares a similar structure in both **Python** and **C++**, with consistent core logic across implementations. Here, the **C++** version is used to explain the implementation.
 
 #### 1. Subscribe to the `/reaching_goal/goal` topic
-The Service Node subscribes to the /reaching_goal/goal topic to track the robot's current target coordinates. 
+The Service Node subscribes to the /reaching_goal/goal topic to track the robot current target coordinates. 
 ```cpp
 ros::Subscriber sub = nh.subscribe("/reaching_goal/goal", 10, planningCallback);
 ```
@@ -231,21 +296,22 @@ rosservice call /get_last_target
 ### Launch file
 The launch files in this package are used to start both the Action Client Node and Service Node simultaneously. Each node is specified with key attributes in the `<node>` tag, including the package (`pkg`), the executable file (`type`), a custom name for the node (`name`), and the logging behavior (`output`).
 
-**C++** Version: `coordinate_control_cpp.launch`
+**C++** Version: `coordinate_control_cpp.launch`<br>
 This file launches the **C++** Action Client Node and Service Node:
 ```xml
 <launch>
     <!-- Launch the service node -->
-    <node name="service_node" pkg="assignment2_rt_part1" type="service_node" output="screen" />
-
+    <node name="service_node" pkg="assignment2_rt_part1" 
+    type="service_node" output="screen" />
     <!-- Launch the action client node -->
-    <node name="action_client_node" pkg="assignment2_rt_part1" type="action_client_node" output="screen"/>
+    <node name="action_client_node" pkg="assignment2_rt_part1" t
+    ype="action_client_node" output="screen"/>
 </launch>
 ```
 - `pkg="assignment2_rt_part1"`: Specifies the ROS package where the node resides.
 - `type="action_client_node"`: Specifies the executable for the Action Client Node in C++.
 - `name="action_client_node"`: Assigns a custom name (action_client_node) to the node.
-- `output="screen"`: Logs the` output (e.g., print statements and errors) to the terminal.
+- `output="screen"`: Logs the` output (e.g., print statements and errors) to the terminal.<br>
 The Service Node follows a similar structure:<br>
     - `type="service_node"`: Points to the executable for the Service Node in C++.
     - `name="service_node"`: Names the node as service_node.
