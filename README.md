@@ -224,7 +224,7 @@ This communication allows the Action Client Node to request the robot to navigat
 #### 3. Cancel Goal
 #### 4. Goal Reached
 
-#### 5. Subscribe to `/odom`
+#### 5. Subscribe to `/odom` topic
 The `/odom` topic provides odometry information, including the robot's position and orientation in the world frame. The node subscribes to this topic to get the robot's current position and velocity:
 ```cpp
 ros::Subscriber sub_odom = nh.subscribe("/odom", 10, odomCallback);
