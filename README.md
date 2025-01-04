@@ -66,18 +66,19 @@ The root of this repository is the package folder, which contains all necessary 
 
 ### Folder and File Overview
 - **`/launch`**: Contains launch files
-    - `coordinate_control_py.launch`: Launch file that starts the Action Client Node and Service Node simultaneously.
+    - `coordinate_control_cpp.launch`: Launch file for C++ version
+    - `coordinate_control_py.launch`: Launch file for the Python version, launching both nodes simultaneously.
 
 - **`/msg`**: Contains custom message definitions.
     - `robot_status.msg`: Defines the custom message to publish the robot's position and velocity.
 
-- **`/scripts`**: Contains Python scripts used for the nodes in this project.
-    - `action_client_node.py`: Python version of action client node.
-    - `service_node.py`: Python version of service node.
+- **`/scripts`**: Contains Python scripts for nodes.
+    - `action_client_node.py`: Python implementation of the action client node.
+    - `service_node.py`: Python implementation of the service node.
 
-- **`/src`**: Contains C++ source files.
-    - `action_client_node.cpp`: The main action client code.
-    - `service_node.cpp`: Service node that fetches last known target.
+- **`/src`**:  Contains C++ source files.
+    - `action_client_node.cpp`: Main C++ code for the action client node.
+    - `service_node.cpp`: C++ code for the service node fetching the last known target.
 
 - **`/srv`**: Contains custom service definitions.
     - `get_last_target.srv`: Defines the service for retrieving the last target coordinates.
@@ -148,19 +149,80 @@ source ~/ros_ws/devel/setup.bash
 
 #### 1. Launch the `assignment_2_2024` Package
 
-Before launching your node, ensure that the simulation environment is running. Start the `assignment_2_2024` package to load the simulation in Gazebo and Rviz:
+Before launching your nodes, ensure that the simulation environment is running. To start the simulation in Gazebo and Rviz, run the following command:
 ```bash
 roslaunch assignment_2_2024 assignment1.launch
 ```
 This will spawn the robot in the simulation environment and start the action server, which the Action Client Node will interact with. <br>
-Please wait for everything to load properly before proceeding.
+**Note**: Please wait for everything to load properly before proceeding.
 
 #### 2. Launch the Action Client Node and Service Node
-After the simulation environment is set up, you can launch your Action Client Node and Service Node using the following launch file:
+
+After the simulation environment is running, you can proceed to launch either the **C++** or **Python** version of the nodes. 
+
+#### Running the C++ Version
+To launch the C++ version of the nodes, use the following command:
+```bash
+roslaunch assignment2_rt_part1 coordinate_control_cpp.launch
+```
+#### Running the Python Version
+To launch the Python version of the nodes, use the following command:
 ```bash
 roslaunch assignment2_rt_part1 coordinate_control_py.launch
 ```
 This will launch both the Action Client Node and the Service Node simultaneously.
 
+#### 3. Running ROS Service to Get Last Coordinates
+After the Action Client Node is running, you can retrieve the last set target coordinates via the following service call:
+```bash
+rosservice call /get_last_target 
+```
+This will fetch the last target coordinates that were set for the robot, based on the most recent input from the user.
+
+#### 4. Stopping the nodes
+
+To stop the nodes, simply press `Ctrl+C` in the terminal where each nodes are running . This will terminate the nodes and stop the simulation.
+
 ## Implementation Details
+
+### Action Client Node
+
+### Service Node
+The **Service Node** shares a similar structure in both **Python** and **C++**, with consistent core logic across implementations. Here, the **C++** version is used to explain the implementation.
+
+#### 1. Subscribe to the `/reaching_goal/goal` topic
+The Service Node subscribes to the /reaching_goal/goal topic to track the robot's current target coordinates. 
+```cpp
+ros::Subscriber sub = nh.subscribe("/reaching_goal/goal", 10, planningCallback);
+```
+The node extracts the `x` and `y` coordinates from the incoming messages and stores them in variables (`last_target_x` and `last_target_y`) to keep track of the most recent goal.
+```cpp
+void planningCallback(const assignment_2_2024::PlanningActionGoal::ConstPtr &msg){
+    last_target_x = msg->goal.target_pose.pose.position.x;  // Access x coordinate
+    last_target_y = msg->goal.target_pose.pose.position.y;  // Access y coordinate
+}
+```
+This ensures the Service Node always has the latest target coordinates for responding to service calls or other queries.
+
+#### 2. Publish the last target coordinate
+The Service Node provides a ROS service that responds with the last target coordinates (`last_target_x` and `last_target_y`) when queried. 
+The service is implemented using the ROS service mechanism. It listens for requests on a specific service topic `/get_last_target`.
+```cpp
+ros::ServiceServer service = nh.advertiseService("get_last_target", handle_get_last_target);
+```
+The callback function handles incoming service requests. It fills the response with the current values of `last_target_x` and `last_target_y`:
+```cpp
+bool handle_get_last_target(assignment2_rt_part1::get_last_target::Request &req,
+    assignment2_rt_part1::get_last_target::Response &res){
+    res.x = last_target_x;
+    res.y = last_target_y;
+    return true;  // Return success
+}
+```
+Once the service is running, it can be called from the terminal using:
+```bash
+rosservice call /get_last_target
+```
+### Launch file
+
 ## Summary
