@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     // Define the service with the name 'get_last_target' and the callback function
     ros::ServiceServer service = nh.advertiseService("get_last_target", handle_get_last_target);
 
-    ROS_INFO("Service 'get_last_target' is ready and subscribing to /reaching_goal/goal.");
+    ROS_INFO("Service 'get_last_target' is ready.");
 
     // Keep the node running and wait for requests
     ros::spin();
