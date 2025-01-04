@@ -120,7 +120,7 @@ bool getValidCoordinate(const std::string& prompt, double& coordinate) {
             
             // Check if the whole string was consumed by std::stod
             if (pos == input.length()) {
-                return true;  // Valid number, no leftover characters
+                return true; 
             } else {
                 std::cerr << "Invalid input! Please enter a valid number." << std::endl;
             }
@@ -139,10 +139,6 @@ void sendGoal(actionlib::SimpleActionClient<assignment_2_2024::PlanningAction>& 
 
     // Log the goal
     ROS_INFO("Sending goal: x=%.2f, y=%.2f", target_x, target_y);
-
-    // Set the target coordinates as ROS parameters
-    ros::param::set("last_target_x", target_x);
-    ros::param::set("last_target_y", target_y);
 
     // Send the goal to the action server and listen for feedback
     ac.sendGoal(goal);  // Set up feedback callback

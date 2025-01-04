@@ -35,11 +35,7 @@ def send_goal(client, target_x, target_y):
     goal.target_pose.pose.position.z = 0.0
     goal.target_pose.pose.orientation.w = 1.0
     rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
-
-    # Set the target coordinates as ROS parameters
-    rospy.set_param('last_target_x', target_x)
-    rospy.set_param('last_target_y', target_y)
-    
+   
     # Send the goal to the action server and listen for feedback
     client.send_goal(goal, feedback_cb=feedback_callback)
     goal_active = True  # Mark the goal as active
@@ -67,7 +63,6 @@ def action_client_node():
     # Publisher to send robot's position and velocity to the topic
     pub = rospy.Publisher('/robot_status', robot_status, queue_size=10)
     
-
     while not rospy.is_shutdown():
         try:
             # Get user input for target coordinates
