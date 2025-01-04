@@ -8,13 +8,18 @@ This repository contains the assignment work for the **Research Track I** course
 - [Node and Launch File Details](#node-and-launch-file-details)
     - [Action Client Node](#action-client-node)
     - [Service Node](#service-node)
-    - [Launch File](#launch-file-coordinate-control)
+    - [Launch File](#launch-files)
 - [Repository Structure](#repository-structure)
 - [Getting Started (Read Before Action)](#getting-started-read-before-action)
     - [Prerequisites](#prerequisites)
     - [Setup](#setup)
 - [Launching Nodes](#launching-nodes)
+    - [Launch the assignment_2_2024 Package](#1-launch-the-assignment_2_2024-package)
+    - [Launch the Action Client Node and Service Node](#2-launch-the-action-client-node-and-service-node)
 - [Implementation Details](#implementation-details)
+    - [Action Client Node](#action-client-node-1)
+    - [Service Node](#service-node-1)
+    - [Launch files](#launch-file-1)
 - [Summary](#summary)
 
 ## Introduction
@@ -55,7 +60,7 @@ Key Features:
  - Listens for service calls (`/get_last_target`) and responds with the last target coordinates.
  - Maintains consistency with the Action Client Node through parameters.
 
-### Launch File
+### Launch Files
 
 The launch file simplifies the process of starting the nodes. It:
  - Launches the Action Client Node and Service Node simultaneously.
@@ -224,5 +229,25 @@ Once the service is running, it can be called from the terminal using:
 rosservice call /get_last_target
 ```
 ### Launch file
+The launch files in this package are used to start both the Action Client Node and Service Node simultaneously. Each node is specified with key attributes in the `<node>` tag, including the package (`pkg`), the executable file (`type`), a custom name for the node (`name`), and the logging behavior (`output`).
+
+**C++** Version: `coordinate_control_cpp.launch`
+This file launches the **C++** Action Client Node and Service Node:
+```xml
+<launch>
+    <!-- Launch the service node -->
+    <node name="service_node" pkg="assignment2_rt_part1" type="service_node" output="screen" />
+
+    <!-- Launch the action client node -->
+    <node name="action_client_node" pkg="assignment2_rt_part1" type="action_client_node" output="screen"/>
+</launch>
+```
+- `pkg="assignment2_rt_part1"`: Specifies the ROS package where the node resides.
+- `type="action_client_node"`: Specifies the executable for the Action Client Node in C++.
+- `name="action_client_node"`: Assigns a custom name (action_client_node) to the node.
+- `output="screen"`: Logs the` output (e.g., print statements and errors) to the terminal.
+The Service Node follows a similar structure:<br>
+    - `type="service_node"`: Points to the executable for the Service Node in C++.
+    - `name="service_node"`: Names the node as service_node.
 
 ## Summary
