@@ -2,7 +2,7 @@
 
 import rospy
 import actionlib
-from assignment_2_2024.msg import PlanningAction, PlanningGoal
+from assignment_2_2024.msg import PlanningAction, PlanningGoal, PlanningFeedback
 from nav_msgs.msg import Odometry
 from assignment2_rt_part1.msg import robot_status
 
@@ -37,7 +37,19 @@ def send_goal(client, target_x, target_y):
     rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
    
     # Send the goal to the action server and listen for feedback
-    client.send_goal(goal, feedback_cb=feedback_callback)
+    
+def send_goal(client, target_x, target_y):
+    """Send the goal to the action server."""
+    global goal_active
+    goal = PlanningGoal()  # Create a goal instance
+    goal.target_pose.pose.position.x = target_x  # Set the target x-coordinate
+    goal.target_pose.pose.position.y = target_y  # Set the target y-coordinate
+    goal.target_pose.pose.position.z = 0.0
+    goal.target_pose.pose.orientation.w = 1.0
+    rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
+   
+    # Send the goal to the action server and listen for feedback
+    client.send_goal(goal, done_cb=None, active_cb=None, feedback_cb=feedback_callback)
     goal_active = True  # Mark the goal as active
 
 def cancel_goal(client):
