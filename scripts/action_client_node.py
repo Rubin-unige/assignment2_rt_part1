@@ -25,19 +25,7 @@ def odom_callback(msg):
 def feedback_callback(feedback):
     if feedback.stat == "Target Reached!":
         rospy.loginfo("Goal Reached!! Press 'Enter' to continue!!")
-
-def send_goal(client, target_x, target_y):
-    """Send the goal to the action server."""
-    global goal_active
-    goal = PlanningGoal()  # Create a goal instance
-    goal.target_pose.pose.position.x = target_x  # Set the target x-coordinate
-    goal.target_pose.pose.position.y = target_y  # Set the target y-coordinate
-    goal.target_pose.pose.position.z = 0.0
-    goal.target_pose.pose.orientation.w = 1.0
-    rospy.loginfo(f"Sending goal: x={target_x}, y={target_y}")
-   
-    # Send the goal to the action server and listen for feedback
-    
+ 
 def send_goal(client, target_x, target_y):
     """Send the goal to the action server."""
     global goal_active
