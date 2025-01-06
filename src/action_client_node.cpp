@@ -18,6 +18,14 @@ bool getValidCoordinate(const std::string& prompt, double& coordinate);
 void sendGoal(actionlib::SimpleActionClient<assignment_2_2024::PlanningAction>& ac, double target_x, double target_y);
 void cancelGoal(actionlib::SimpleActionClient<assignment_2_2024::PlanningAction>& ac);
 
+// Feedback callback function
+void feedbackCallback(const assignment_2_2024::PlanningFeedbackConstPtr& feedback) {
+
+    if (feedback->stat == "Target Reached!") {
+        ROS_INFO("Goal reached!! Press 'Enter' to continue!!");
+    }
+}
+
 // Main function
 int main(int argc, char** argv) {
     // Initialize ROS
@@ -79,7 +87,7 @@ int main(int argc, char** argv) {
 
             // Check the outcome of the goal
             if (ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
-                ROS_INFO("Goal reached successfully!");
+                ROS_INFO("Please enter new coordinates !!");
             } else if (cancel_goal_flag) {
                 ROS_INFO("Goal was canceled by the user.");
             } else {
@@ -141,7 +149,7 @@ void sendGoal(actionlib::SimpleActionClient<assignment_2_2024::PlanningAction>& 
     ROS_INFO("Sending goal: x=%.2f, y=%.2f", target_x, target_y);
 
     // Send the goal to the action server and listen for feedback
-    ac.sendGoal(goal);  // Set up feedback callback
+    ac.sendGoal(goal, NULL, NULL, &feedbackCallback); 
     goal_active = true;  // Mark the goal as active
 }
 

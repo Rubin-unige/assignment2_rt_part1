@@ -23,8 +23,8 @@ def odom_callback(msg):
     vel_z = msg.twist.twist.angular.z
 
 def feedback_callback(feedback):
-    """Feedback callback to handle updates from the action server."""
-    pass  # No operation performed
+    if feedback.stat == "Target Reached!":
+        rospy.loginfo("Goal Reached!! Press 'Enter' to continue!!")
 
 def send_goal(client, target_x, target_y):
     """Send the goal to the action server."""
@@ -93,7 +93,7 @@ def action_client_node():
 
             # Check the outcome of the goal
             if client.get_state() == actionlib.GoalStatus.SUCCEEDED:
-                rospy.loginfo("Goal reached successfully!")
+                rospy.loginfo("Please Enter new coordinates !!")
             elif cancel_goal_flag:
                 rospy.loginfo("Goal was canceled by the user.")
             else:
