@@ -61,7 +61,7 @@ def action_client_node():
     rospy.Subscriber('/odom', Odometry, odom_callback)
 
     # Publisher to send robot's position and velocity to the topic
-    rospy.Publisher('/robot_status', robot_status, queue_size=10)
+    pub = rospy.Publisher('/robot_status', robot_status, queue_size=10)
     
     while not rospy.is_shutdown():
         try:
