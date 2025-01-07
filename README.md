@@ -164,7 +164,7 @@ Before running the Python scripts, you need to ensure they are executable:
 chmod +x ~/ros_ws/src/assignment2_rt_part1/scripts/action_client_node.py
 chmod +x ~/ros_ws/src/assignment2_rt_part1/scripts/service_node.py
 ```
-You can proceed now to launch either the **Python** version of the nodes. Both node is launched by launch file. 
+You can proceed now to launch the **Python** version of the nodes. Both node is launched by launch file. 
 
 #### Running the Python Version
 To launch the Python version of the nodes, use the following command:
@@ -226,7 +226,7 @@ while not rospy.is_shutdown() and client.get_state() not in
 - `client.get_state()`: This checks the current state of the goal. The loop continues as long as the goal is neither succeeded, aborted, nor rejected.
 - `User Input`: The program prompts the user to enter 'cancel' to stop the robot. If 'cancel' is entered, the cancel_goal() function is invoked.
 
-`cancel_goal()` Function
+`cancel_goal()` Function<br>
 The cancel_goal() function is responsible for sending a cancel request to the Action Server. Here's the implementation:
 ```python
 def cancel_goal(client):
@@ -244,7 +244,7 @@ The "Cancel Goal" feature provides an interactive way to stop the robot's moveme
 #### 4. Goal Reached
 The Goal Reached functionality is designed to notify the user when the robot successfully reaches its target coordinates. This is accomplished by processing feedback from the Action Server using a callback function.
 
-**Feedback Callback**
+**Feedback Callback**<br>
 The `feedback_callback` function monitors the progress of the robot towards its goal. When the robot reaches the target, the function logs a message indicating that the goal has been reached and prompts the user to press 'Enter' to continue.
 ```python
 def feedback_callback(feedback):
@@ -293,14 +293,13 @@ The `robot_status` message is a custom message that contains the robot's positio
 This node provides a service to retrieve the last target coordinates set by the user.
 
 #### 1. Subscribe to the `/reaching_goal/goal` topic
-The Service Node subscribes to the /reaching_goal/goal topic to track the robot current target coordinates. 
+The Service Node subscribes to the `/reaching_goal/goal` topic to track the robot current target coordinates. 
 ```python
 rospy.Service('get_last_target', get_last_target, handle_get_last_target)
 ```
 The node extracts the `x` and `y` coordinates from the incoming messages and stores them in variables (`last_target_x` and `last_target_y`) to keep track of the most recent goal.
 ```python
 def planning_callback(msg):
-    """Callback function to update the last target coordinates from the PlanningActionGoal."""
     global last_target_x, last_target_y
     # Access the target pose from the goal and update the coordinates
     last_target_x = msg.goal.target_pose.pose.position.x
