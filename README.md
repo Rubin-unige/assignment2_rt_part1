@@ -33,6 +33,7 @@ This repository includes a ROS package with the following components:
 
 **Note**:
 - This assignment is completed using **Python**. 
+- The **C++** part was removed to focus solely on the working Python node.
 
 ## Node and Launch File Details
 
@@ -53,8 +54,7 @@ Key Features:
 
 ### Service node
 
-This node provides a service to:
- - Retrieve the last target coordinates set by the user.
+This node provides a service to retrieve the last target coordinates set by the user.
 
 Key Features:
  - Listens for service calls (`/get_last_target`) and responds with the last target coordinates.
@@ -194,6 +194,9 @@ The node asks the user to enter the target x and y coordinates. If the input is 
 # Get user input for target coordinates
 target_x = float(input("Enter target x coordinate: "))
 target_y = float(input("Enter target y coordinate: "))
+# when input is invalid
+except ValueError:
+    rospy.logerr("Invalid input! Please enter valid numbers for the target coordinates.")
 ```
 
 #### 2. Send Goal to Action Server
@@ -239,13 +242,14 @@ def cancel_goal(client):
 - `goal_active`: A boolean that tracks whether the goal is currently active.
 - `client.cancel_goal()`: This function sends a cancel request to the Action Server, stopping the robot from moving towards the goal.
 
+The goal can only be canceled when the robot is actively moving, which is tracked using the `goal_active` flag.
 The "Cancel Goal" feature provides an interactive way to stop the robot's movement based on user input, ensuring flexibility and control over the robot's actions.
 
 #### 4. Goal Reached
 The Goal Reached functionality is designed to notify the user when the robot successfully reaches its target coordinates. This is accomplished by processing feedback from the Action Server using a callback function.
 
 **Feedback Callback**<br>
-The `feedback_callback` function monitors the progress of the robot towards its goal. When the robot reaches the target, the function logs a message indicating that the goal has been reached and prompts the user to press 'Enter' to continue.
+The `feedback_callback` function monitors the progress of the robot towards it's goal. When the robot reaches the target, the function logs a message indicating that the goal has been reached and prompts the user to press 'Enter' to continue.
 ```python
 def feedback_callback(feedback):
     if feedback.stat == "Target reached!":
@@ -253,6 +257,11 @@ def feedback_callback(feedback):
 ```
 - `feedback.stat`: This contains the current status of the robot. If the status is "Target reached!", the function logs a success message.
 - `rospy.loginfo`: Used to log informational messages in ROS.
+
+**Note**:
+In the **Python** implementation, the `input()` function is used to wait for the user to either cancel the goal when the robot is moving. When the user presses 'Enter' without typing anything, it simply continues to the next step without cancelling the goal. This allows the program to be non-blocking for user input, making it easy to prompt the user to acknowledge when the goal has been reached (by pressing 'Enter'). This behavior is convenient in Python, where the input function doesn't block other parts of the code from executing.
+
+However, achieving the same functionality in **C++** would require a more complex approach, such as using threads. In C++, the input method would block the main thread, preventing other actions (like monitoring feedback or goal status updates) from executing while waiting for the user input. To resolve this, multi-threading would be needed to handle user input asynchronously. Unfortunately, due to time constraints, this multi-threading approach was not implemented, and I decided to remove the C++ part of this node.
 
 #### 5. Subscribe to `/odom` topic
 The `/odom` topic provides odometry information, including the robot's position and orientation in the world frame. The node subscribes to this topic to get the robot's current position and velocity:
