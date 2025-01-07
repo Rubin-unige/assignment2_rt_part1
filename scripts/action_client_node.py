@@ -23,7 +23,7 @@ def odom_callback(msg):
     vel_z = msg.twist.twist.angular.z
 
 def feedback_callback(feedback):
-    if feedback.stat == "Target Reached!":
+    if feedback.stat == "Target reached!":
         rospy.loginfo("Goal Reached!! Press 'Enter' to continue!!")
  
 def send_goal(client, target_x, target_y):
@@ -61,7 +61,7 @@ def action_client_node():
     rospy.Subscriber('/odom', Odometry, odom_callback)
 
     # Publisher to send robot's position and velocity to the topic
-    pub = rospy.Publisher('/robot_status', robot_status, queue_size=10)
+    rospy.Publisher('/robot_status', robot_status, queue_size=10)
     
     while not rospy.is_shutdown():
         try:
@@ -107,7 +107,7 @@ def action_client_node():
         
         # After handling the goal or cancelation, return to accepting new coordinates
         cancel_goal_flag = False  # Reset the cancel flag before the next iteration
-        rospy.sleep(1)  # Sleep for 1 second before allowing another input
+        rospy.sleep(0.5)  # Sleep for 1 second before allowing another input
 
 
 if __name__ == '__main__':

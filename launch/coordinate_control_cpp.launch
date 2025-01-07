@@ -1,7 +1,0 @@
-<launch>
-    <!-- Launch the service node -->
-    <node name="service_node" pkg="assignment2_rt_part1" type="service_node" output="screen" />
-
-    <!-- Launch the action client node -->
-    <node name="action_client_node" pkg="assignment2_rt_part1" type="action_client_node" output="screen"/>
-</launch>

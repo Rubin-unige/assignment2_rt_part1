@@ -2,7 +2,7 @@
 
 import rospy
 from assignment2_rt_part1.srv import get_last_target, get_last_targetResponse
-from assignment_2_2024.msg import PlanningActionGoal  # Use PlanningActionGoal
+from assignment_2_2024.msg import PlanningActionGoal
 from geometry_msgs.msg import PoseStamped
 
 # Global variable to store last target coordinates
