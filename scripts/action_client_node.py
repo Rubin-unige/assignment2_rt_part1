@@ -80,6 +80,8 @@ def action_client_node():
                     cancel_goal_flag = True
                     cancel_goal(client)
                     break
+                elif client.get_state() == actionlib.GoalStatus.SUCCEEDED:
+                    break 
 
                 # Publish robot's current position and velocity
                 pos_vel_msg = robot_status()

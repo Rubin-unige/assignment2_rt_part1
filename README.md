@@ -211,7 +211,48 @@ client.send_goal(goal, done_cb=None, active_cb=None, feedback_cb=feedback_callba
 This communication allows the Action Client Node to request the robot to navigate to the specified target position. The Action Server will process the goal and attempt to move the robot accordingly.
 
 #### 3. Cancel Goal
+The Cancel Goal functionality allows the user to stop the robot from moving towards the target coordinates if needed. This is particularly useful in situations where the goal becomes irrelevant or the robot needs to be redirected.
+```python
+# Monitor the goal state and robot's position while the goal is in progress
+while not rospy.is_shutdown() and client.get_state() not in 
+[actionlib.GoalStatus.SUCCEEDED, actionlib.GoalStatus.ABORTED, actionlib.GoalStatus.REJECTED]:
+    # Check for user input to cancel the goal
+    user_input = input("Robot running!! Enter 'cancel' to cancel the current goal: ").strip().lower()
+    if user_input == 'cancel':
+        cancel_goal_flag = True
+        cancel_goal(client)
+        break
+```
+- `client.get_state()`: This checks the current state of the goal. The loop continues as long as the goal is neither succeeded, aborted, nor rejected.
+- `User Input`: The program prompts the user to enter 'cancel' to stop the robot. If 'cancel' is entered, the cancel_goal() function is invoked.
+
+`cancel_goal()` Function
+The cancel_goal() function is responsible for sending a cancel request to the Action Server. Here's the implementation:
+```python
+def cancel_goal(client):
+    """Cancel the goal if the cancel flag is set and the robot is moving."""
+    global cancel_goal_flag, goal_active
+    if cancel_goal_flag and goal_active:
+        client.cancel_goal()
+```
+- `cancel_goal_flag`: This global flag is set to True when the user enters 'cancel'.
+- `goal_active`: A boolean that tracks whether the goal is currently active.
+- `client.cancel_goal()`: This function sends a cancel request to the Action Server, stopping the robot from moving towards the goal.
+
+The "Cancel Goal" feature provides an interactive way to stop the robot's movement based on user input, ensuring flexibility and control over the robot's actions.
+
 #### 4. Goal Reached
+The Goal Reached functionality is designed to notify the user when the robot successfully reaches its target coordinates. This is accomplished by processing feedback from the Action Server using a callback function.
+
+**Feedback Callback**
+The `feedback_callback` function monitors the progress of the robot towards its goal. When the robot reaches the target, the function logs a message indicating that the goal has been reached and prompts the user to press 'Enter' to continue.
+```python
+def feedback_callback(feedback):
+    if feedback.stat == "Target reached!":
+        rospy.loginfo("Goal Reached!! Press 'Enter' to continue!!")
+```
+- `feedback.stat`: This contains the current status of the robot. If the status is "Target reached!", the function logs a success message.
+- `rospy.loginfo`: Used to log informational messages in ROS.
 
 #### 5. Subscribe to `/odom` topic
 The `/odom` topic provides odometry information, including the robot's position and orientation in the world frame. The node subscribes to this topic to get the robot's current position and velocity:
