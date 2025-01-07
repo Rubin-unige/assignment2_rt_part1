@@ -351,3 +351,11 @@ The Service Node follows a similar structure:<br>
     - `name="service_node"`: Names the node as service_node.
 
 ## Summary
+
+This project provides a ROS-based control system for a robot in a Gazebo simulation, showcasing the interaction between Action Clients and Service Nodes. It features:
+
+- **Action Client Node**: Allows users to set and cancel target coordinates dynamically, providing real-time feedback from the Action Server.
+- **Service Node**: Maintains and retrieves the last target coordinates through a dedicated ROS service.
+- **Launch Files**: Simplify the process of running the nodes simultaneously.
+
+The system effectively demonstrates ROS concepts like action servers, services, and real-time robot control in simulation environments. With straightforward setup instructions, it is designed to facilitate quick deployment and experimentation.
