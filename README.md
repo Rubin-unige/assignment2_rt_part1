@@ -3,8 +3,8 @@ This repository contains the assignment work for the **Research Track I** course
 **Rubin Khadka Chhetri**  
 **ID: 6558048**
 
-Project documentation can be found online at: <br>
-**https://rubin-unige.github.io/assignment2_rt_part1**
+**Project documentation** can be found online at: <br>
+https://rubin-unige.github.io/assignment2_rt_part1
 
 ## Table of Contents
 - [Introduction](#introduction)
