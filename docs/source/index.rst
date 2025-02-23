@@ -1,17 +1,22 @@
-.. Research Track I - Second Assignment Part I documentation master file, created by
-   sphinx-quickstart on Sun Feb 23 12:05:58 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Research Track I - Second Assignment Part I
 =======================================================================
-Action Client and Service Node for setting and retrieving target coordinates
+Action Client and Service Node for Setting and Retrieving Target Coordinates
+
+:Author: Rubin Khadka Chhetri
+:Version: 1.0
+:Date: February 23, 2025
+
+This documentation provides an overview of the action client and service node implemented in this project. It includes details about node functionality, launch configurations, message types, and services provided.
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
-
+   nodes/index
+   launch
+   messages
+   services
 
 Indices and tables
 ==================

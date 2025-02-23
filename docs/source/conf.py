@@ -5,7 +5,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../../scripts'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -30,11 +30,12 @@ extensions = [
 'sphinx.ext.githubpages',
 "sphinx.ext.napoleon",
 'sphinx.ext.inheritance_diagram',
-'breathe'
+'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = []
+
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -44,8 +45,8 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Extension configuration
-# -- Options for intersphinx extension ---------------------------------------
 
+# -- Options for intersphinx extension ---------------------------------------
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 
 # -- Options for todo extension ----------------------------------------------

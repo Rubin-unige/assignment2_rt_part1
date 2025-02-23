@@ -1,5 +1,26 @@
 #!/usr/bin/env python
 
+"""
+.. module:: action_client_node
+   :platform: Unix
+   :synopsis: Python module for controlling the robot using ROS actions.
+.. moduleauthor:: Rubin Khadka Chhetri
+
+This node acts as an action client for the ROS navigation stack. It allows the user to send goals (target coordinates) to the robot and cancel them if needed. The node also subscribes to the `/odom` topic to monitor the robot's position and velocity, and publishes this information to the `/robot_status` topic.
+
+Subscribes to:
+    - `/odom` (Odometry): The robot's current position and velocity.
+
+Publishes to:
+    - `/robot_status` (robot_status): The robot's current position and velocity.
+
+Actions:
+    - `/reaching_goal` (PlanningAction): The action server for sending goals to the robot.
+
+Dependencies:
+    - ``assignment_2_2024`` package
+"""
+
 import rospy
 import actionlib
 from assignment_2_2024.msg import PlanningAction, PlanningGoal, PlanningFeedback
@@ -8,14 +29,25 @@ from assignment2_rt_part1.msg import robot_status
 
 # Global variables to store the robot's position and velocity
 current_x = 0.0
+"""float: The current x-coordinate of the robot."""
 current_y = 0.0
+"""float: The current y-coordinate of the robot."""
 vel_x = 0.0
+"""float: The linear velocity of the robot in the x-direction."""
 vel_z = 0.0
-cancel_goal_flag = False  # Flag to cancel the goal
-goal_active = False  # Indicates if a goal is currently being pursued
+"""float: The angular velocity of the robot around the z-axis."""
+cancel_goal_flag = False
+"""bool: Flag to indicate if the current goal should be canceled."""
+goal_active = False
+"""bool: Flag to indicate if a goal is currently active."""
 
 def odom_callback(msg):
-    """Callback function to update robot's position and velocity from /odom."""
+    """
+    Callback function to update the robot's position and velocity from the `/odom` topic.
+
+    Args:
+        msg (Odometry): The message containing the robot's current position and velocity.
+    """
     global current_x, current_y, vel_x, vel_z
     current_x = msg.pose.pose.position.x
     current_y = msg.pose.pose.position.y
@@ -23,11 +55,24 @@ def odom_callback(msg):
     vel_z = msg.twist.twist.angular.z
 
 def feedback_callback(feedback):
+    """
+    Callback function to handle feedback from the action server.
+
+    Args:
+        feedback (PlanningFeedback): The feedback message from the action server.
+    """
     if feedback.stat == "Target reached!":
         rospy.loginfo("Goal Reached!! Press 'Enter' to continue!!")
- 
+
 def send_goal(client, target_x, target_y):
-    """Send the goal to the action server."""
+    """
+    Send a goal to the action server.
+
+    Args:
+        client (SimpleActionClient): The action client used to communicate with the action server.
+        target_x (float): The target x-coordinate for the robot.
+        target_y (float): The target y-coordinate for the robot.
+    """
     global goal_active
     goal = PlanningGoal()  # Create a goal instance
     goal.target_pose.pose.position.x = target_x  # Set the target x-coordinate
@@ -41,13 +86,23 @@ def send_goal(client, target_x, target_y):
     goal_active = True  # Mark the goal as active
 
 def cancel_goal(client):
-    """Cancel the goal if the cancel flag is set and the robot is moving."""
+    """
+    Cancel the current goal if the cancel flag is set and the robot is moving.
+
+    Args:
+        client (SimpleActionClient): The action client used to communicate with the action server.
+    """
     global cancel_goal_flag, goal_active
     if cancel_goal_flag and goal_active:
         client.cancel_goal()
 
 def action_client_node():
-    """Main action client node."""
+    """
+    Main function for the action client node.
+
+    This node allows the user to send goals to the robot and cancel them if needed.
+    It also publishes the robot's current position and velocity to the `/robot_status` topic.
+    """
     global cancel_goal_flag, goal_active
     
     rospy.init_node('action_client_node')
